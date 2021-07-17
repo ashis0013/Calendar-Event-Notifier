@@ -11,6 +11,8 @@ import (
 	"os"
 	"encoding/json"
 	"google.golang.org/api/calendar/v3"
+	"google.golang.org/api/option"
+	"time"
 )
 
 func getClient(config *oauth2.Config) *http.Client {
@@ -70,4 +72,22 @@ func authGoogleApi() *http.Client{
 			fmt.Println("Unable to parse client secret file to config:")
 	}
 	return getClient(config)
+}
+
+var events *calendar.Events
+
+func fetchEvents() {
+	client := authGoogleApi()
+	ctx := context.Background()
+	s, _ := calendar.NewService(ctx, option.WithHTTPClient(client))
+	t := time.Now().Format(time.RFC3339)
+	te := time.Now().AddDate(0,0,3).Format(time.RFC3339)
+    events,_ = s.Events.List("primary").ShowDeleted(false).SingleEvents(true).TimeMin(t).TimeMax(te).MaxResults(10).OrderBy("startTime").Do()
+}
+
+func fetchEventsRoutine() {
+	for {
+		fetchEvents()
+		time.Sleep(time.Second)
+	}
 }
