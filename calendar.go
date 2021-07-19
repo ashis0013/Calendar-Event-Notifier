@@ -89,6 +89,6 @@ func fetchEvents() {
 func fetchEventsRoutine() {
 	for {
 		fetchEvents()
-		time.Sleep(time.Minute * 20)
+		time.Sleep(time.Minute * time.Duration(fetchSleep))
 	}
 }
