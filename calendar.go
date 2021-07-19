@@ -15,8 +15,10 @@ import (
 	"time"
 )
 
+var events *calendar.Events
+
 func getClient(config *oauth2.Config) *http.Client {
-	tokFile := "/Users/ashis.paul/go/src/calendar-notifier/token.json"
+	tokFile := tokLoc
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
 			tok = getTokenFromWeb(config)
@@ -66,7 +68,7 @@ func saveToken(path string, token *oauth2.Token) {
 }
 
 func authGoogleApi() *http.Client{
-	b, err := ioutil.ReadFile("/Users/ashis.paul/go/src/calendar-notifier/credentials.json")
+	b, err := ioutil.ReadFile(credLoc)
 	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
 	if err != nil {
 			fmt.Println("Unable to parse client secret file to config:")
@@ -74,7 +76,6 @@ func authGoogleApi() *http.Client{
 	return getClient(config)
 }
 
-var events *calendar.Events
 
 func fetchEvents() {
 	client := authGoogleApi()
@@ -88,6 +89,6 @@ func fetchEvents() {
 func fetchEventsRoutine() {
 	for {
 		fetchEvents()
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute * 20)
 	}
 }

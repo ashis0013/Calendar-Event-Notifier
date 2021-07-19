@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	getGlobals()
 	fetchEvents()
 	fmt.Println("Upcoming Events:")
 	for _, item := range events.Items {
@@ -22,5 +23,6 @@ func main() {
 				notify(item.Summary)
 			}
 		}
+		time.Sleep(time.Second)
 	}
 }
