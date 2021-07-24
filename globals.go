@@ -1,17 +1,18 @@
 package main
 
 import (
-	"os"
 	"bufio"
-	"strings"
-	"strconv"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 )
 
 var credLoc string
 var tokLoc string
 var fetchSleep int
 var fetchEventSuccess bool
+var dayRange, minRange *int
 
 func getGlobals() {
 	file, err := os.Open("/Users/ashis.paul/go/src/calendar-notifier/config.cfg")
@@ -25,7 +26,7 @@ func getGlobals() {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		m[strings.Split(line,"=")[0]] = strings.Split(line,"=")[1]
+		m[strings.Split(line, "=")[0]] = strings.Split(line, "=")[1]
 	}
 	credLoc = m["CRED_LOC"]
 	tokLoc = m["TOK_LOC"]

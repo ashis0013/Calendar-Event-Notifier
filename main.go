@@ -1,11 +1,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"time"
 )
 
+func manageFlags() {
+	dayRange = flag.Int("d", 1, "Number of days upto which events will be fetched")
+	minRange = flag.Int("m", 0, "Number of minutes upto which events will be fetched. You can only use one flag.")
+	flag.Parse()
+}
+
 func main() {
+	manageFlags()
 	getGlobals()
 	fetchEvents()
 	if !fetchEventSuccess {
