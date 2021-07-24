@@ -18,11 +18,13 @@ import (
 var events *calendar.Events
 
 func getClient(config *oauth2.Config) *http.Client {
-	tokFile := tokLoc
-	tok, err := tokenFromFile(tokFile)
+	tok, err := tokenFromFile(tokLoc)
 	if err != nil {
 			tok = getTokenFromWeb(config)
-			saveToken(tokFile, tok)
+			if tok == nil {
+				return nil
+			}
+			saveToken(tokLoc, tok)
 	}
 	return config.Client(context.Background(), tok)
 }
@@ -35,11 +37,13 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	var authCode string
 	if _, err := fmt.Scan(&authCode); err != nil {
 			log.Fatalf("Unable to read authorization code: %v", err)
+			return nil
 	}
 
 	tok, err := config.Exchange(oauth2.NoContext, authCode)
 	if err != nil {
 			log.Fatalf("Unable to retrieve token from web: %v", err)
+			return nil
 	}
 	return tok
 }
@@ -63,6 +67,7 @@ func saveToken(path string, token *oauth2.Token) {
 	defer f.Close()
 	if err != nil {
 			log.Fatalf("Unable to cache OAuth token: %v", err)
+			return
 	}
 	json.NewEncoder(f).Encode(token)
 }
@@ -72,6 +77,7 @@ func authGoogleApi() *http.Client{
 	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
 	if err != nil {
 			fmt.Println("Unable to parse client secret file to config:")
+			return nil
 	}
 	return getClient(config)
 }
@@ -79,11 +85,17 @@ func authGoogleApi() *http.Client{
 
 func fetchEvents() {
 	client := authGoogleApi()
+	if client == nil {
+		fmt.Println("ERROR: Cannot get client")
+		fetchEventSuccess = false
+		return
+	}
 	ctx := context.Background()
 	s, _ := calendar.NewService(ctx, option.WithHTTPClient(client))
 	t := time.Now().Format(time.RFC3339)
-	te := time.Now().AddDate(0,0,1).Format(time.RFC3339)
+	te := time.Now().AddDate(0,0,2).Format(time.RFC3339)
     events,_ = s.Events.List("primary").ShowDeleted(false).SingleEvents(true).TimeMin(t).TimeMax(te).MaxResults(10).OrderBy("startTime").Do()
+	fetchEventSuccess = true
 }
 
 func fetchEventsRoutine() {

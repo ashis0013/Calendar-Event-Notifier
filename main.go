@@ -8,6 +8,9 @@ import (
 func main() {
 	getGlobals()
 	fetchEvents()
+	if !fetchEventSuccess {
+		return
+	}
 	fmt.Println("Upcoming Events:")
 	for _, item := range events.Items {
 		date := item.Start.DateTime
