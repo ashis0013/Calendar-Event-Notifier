@@ -15,7 +15,7 @@ var fetchEventSuccess bool
 var dayRange, minRange *int
 
 func getGlobals() {
-	file, err := os.Open("/Users/ashis.paul/go/src/calendar-notifier/config.cfg")
+	file, err := os.Open("config.cfg")
 	if err != nil {
 		fmt.Println("Unable to open config")
 		return
